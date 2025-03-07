@@ -3,16 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to dfinn.me</title>
+    <title>dfinn.me | Welcome</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        a { display: block; margin: 10px; font-size: 20px; color: blue; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        /* General Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+            background-color: #0d0d0d;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* Animated Background Effect */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Centered Content */
+        .container {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        p {
+            font-size: 1.2em;
+            opacity: 0.8;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Styled Button */
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 18px;
+            color: #fff;
+            background: linear-gradient(90deg, #007bff, #00d4ff);
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: 0.3s ease-in-out;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(90deg, #00d4ff, #007bff);
+        }
+
+        /* Subtle Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-    <h1>Welcome to dfinn.me</h1>
-    <p>This is my personal website. Check out my main page below:</p>
-    <a href="https://dfinn.me/HomePage">Go to my main website</a>
+
+    <canvas id="matrixCanvas"></canvas> <!-- Background Effect -->
+    
+    <div class="container">
+        <h1>Welcome to dfinn.me</h1>
+        <p>This is the entry point to me website!</p>
+        <a href="https://dfinn.me/HomePage" class="button">Enter</a>
+    </div>
+
+    <script>
+        // matrix Effect (Code Rain)
+        const canvas = document.getElementById("matrixCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const letters = "01";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#00ff00";
+            ctx.font = `${fontSize}px monospace`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        // Resize canvas on window resize
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
 </body>
 </html>
