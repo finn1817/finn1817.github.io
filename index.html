@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dfinn.me | Welcome</title>
+    <title>Entry Point</title>
     <style>
-        /* General Styling */
+        /* very general styling I found online*/
         body {
             margin: 0;
             padding: 0;
@@ -15,8 +15,7 @@
             text-align: center;
             overflow: hidden;
         }
-
-        /* Animated Background Effect */
+        /* animated effect */
         canvas {
             position: fixed;
             top: 0;
@@ -25,8 +24,7 @@
             height: 100%;
             z-index: -1;
         }
-
-        /* Centered Content */
+        /* centering everything */
         .container {
             position: relative;
             top: 50%;
@@ -34,7 +32,6 @@
             max-width: 600px;
             margin: 0 auto;
         }
-
         h1 {
             font-size: 2.5em;
             font-weight: bold;
@@ -42,14 +39,12 @@
             text-transform: uppercase;
             animation: fadeIn 1.5s ease-in-out;
         }
-
         p {
             font-size: 1.2em;
             opacity: 0.8;
             animation: fadeIn 2s ease-in-out;
         }
-
-        /* Styled Button */
+        /* styling the button */
         .button {
             display: inline-block;
             margin-top: 20px;
@@ -63,13 +58,11 @@
             letter-spacing: 1px;
             transition: 0.3s ease-in-out;
         }
-
         .button:hover {
             transform: scale(1.05);
             background: linear-gradient(90deg, #00d4ff, #007bff);
         }
-
-        /* Subtle Animations */
+        /* subtle animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -77,17 +70,14 @@
     </style>
 </head>
 <body>
-
-    <canvas id="matrixCanvas"></canvas> <!-- Background Effect -->
-    
+    <canvas id="matrixCanvas"></canvas> <!-- background effect -->
     <div class="container">
         <h1>Welcome to dfinn.me</h1>
         <p>This is the entry point to me website!</p>
         <a href="https://dfinn.me/HomePage" class="button">Enter</a>
     </div>
-
     <script>
-        // matrix Effect (Code Rain)
+        // matrix Effect "the code rain"
         const canvas = document.getElementById("matrixCanvas");
         const ctx = canvas.getContext("2d");
 
@@ -117,15 +107,12 @@
                 drops[i]++;
             }
         }
-
         setInterval(drawMatrix, 50);
-
-        // Resize canvas on window resize
+        // resizing the canvas on window resize
         window.addEventListener("resize", () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
     </script>
-
 </body>
 </html>
