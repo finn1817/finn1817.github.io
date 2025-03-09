@@ -3,165 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dfinn.me | Welcome Page</title>
+    <title>dfinn.me | Dev Hub</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-        /* Global Styling */
+        /* General Page Styling */
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Press Start 2P', sans-serif;
-            color: #00ffcc;
+            font-family: 'Courier New', monospace;
             background: #000;
+            color: #00ffcc;
             text-align: center;
             overflow: hidden;
         }
 
-        /* Centered Content */
-        .container {
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        /* Animated Glitch Text */
-        .glitch {
-            font-size: 2.5em;
-            font-weight: bold;
-            position: relative;
-            text-transform: uppercase;
-            animation: glitch 1.5s infinite;
-        }
-
+        /* Animated Glitch Effect */
         @keyframes glitch {
-            0% { text-shadow: 2px 2px 0 #ff0000, -2px -2px 0 #00ff00; }
-            25% { text-shadow: -2px -2px 0 #ff0000, 2px 2px 0 #00ff00; }
-            50% { text-shadow: 2px -2px 0 #ff0000, -2px 2px 0 #00ff00; }
-            75% { text-shadow: -2px 2px 0 #ff0000, 2px -2px 0 #00ff00; }
-            100% { text-shadow: 2px 2px 0 #ff0000, -2px -2px 0 #00ff00; }
+            0% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
+            50% { text-shadow: -2px -2px 0px #ff00ff, 2px 2px 0px #00ffff; }
+            100% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
         }
 
-        /* Typing Effect */
-        .typing {
-            display: inline-block;
-            font-size: 1.2em;
-            white-space: nowrap;
-            overflow: hidden;
-            border-right: 2px solid #00ffcc;
-            animation: typing 3s steps(20) infinite alternate, blink 0.5s step-end infinite;
+        h1 {
+            font-size: 3em;
+            text-transform: uppercase;
+            animation: glitch 1s infinite alternate;
         }
 
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-
-        @keyframes blink {
-            from { border-color: transparent; }
-            to { border-color: #00ffcc; }
-        }
-
-        /* Button - 3D Hover Effect */
-        .button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 15px 30px;
+        /* Terminal-Like Container */
+        .terminal {
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ffcc;
+            text-align: left;
             font-size: 18px;
-            color: #000;
-            background: linear-gradient(90deg, #00ffcc, #007bff);
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.5);
-            transition: transform 0.3s ease-in-out;
+            line-height: 1.5;
+            box-shadow: 0 0 10px #00ffcc;
         }
 
-        .button:hover {
-            transform: rotateY(360deg);
-            background: linear-gradient(90deg, #007bff, #00ffcc);
+        .input-line {
+            display: flex;
         }
 
-        /* Mouse Particle Effect */
-        canvas {
+        .input-line span {
+            color: #00ffcc;
+        }
+
+        .input-field {
+            border: none;
+            background: none;
+            color: #00ffcc;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            width: 100%;
+            outline: none;
+        }
+
+        /* Hidden Easter Egg */
+        .hidden {
+            display: none;
+            font-size: 1.5em;
+            margin-top: 20px;
+            color: #ff00ff;
+        }
+
+        /* Cyberpunk Background Animation */
+        @keyframes neon {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before {
+            content: "";
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: linear-gradient(45deg, #001f3f, #00d4ff, #ff00ff);
+            background-size: 300% 300%;
             z-index: -1;
+            animation: neon 5s infinite alternate;
         }
     </style>
 </head>
 <body>
 
-    <canvas id="particleCanvas"></canvas> <!-- Particle Effect -->
-    
-    <div class="container">
-        <div class="glitch">dfinn.me</div>
-        <p class="typing">> Welcome to my digital space...</p>
-        <a href="https://dfinn.me/HomePage" class="button">Enter</a>
+    <h1>Welcome to dfinn.me</h1>
+
+    <div class="terminal">
+        <p>👨‍💻 Developer Console - Type a command below:</p>
+        <div class="input-line">
+            <span>user@dfinn.me:~$</span>&nbsp;<input type="text" class="input-field" id="commandInput" autofocus>
+        </div>
+        <div id="output"></div>
     </div>
 
+    <p class="hidden" id="secretMessage">🚀 YOU UNLOCKED A SECRET! WELCOME TO THE MATRIX. 🟢</p>
+
     <script>
-        // Particle Effect
-        const canvas = document.getElementById("particleCanvas");
-        const ctx = canvas.getContext("2d");
+        const inputField = document.getElementById("commandInput");
+        const outputDiv = document.getElementById("output");
+        const secretMessage = document.getElementById("secretMessage");
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        let particles = [];
-
-        class Particle {
-            constructor(x, y, size, speedX, speedY) {
-                this.x = x;
-                this.y = y;
-                this.size = size;
-                this.speedX = speedX;
-                this.speedY = speedY;
+        inputField.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                let command = inputField.value.toLowerCase().trim();
+                processCommand(command);
+                inputField.value = "";
             }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.size > 0.2) this.size -= 0.05;
-            }
-
-            draw() {
-                ctx.fillStyle = "#00ffcc";
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function createParticles(event) {
-            const xPos = event.x;
-            const yPos = event.y;
-            for (let i = 0; i < 5; i++) {
-                particles.push(new Particle(xPos, yPos, Math.random() * 5 + 1, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2));
-            }
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach((particle, index) => {
-                particle.update();
-                particle.draw();
-                if (particle.size <= 0.2) particles.splice(index, 1);
-            });
-            requestAnimationFrame(animateParticles);
-        }
-
-        window.addEventListener("mousemove", createParticles);
-        animateParticles();
-
-        // Resize Canvas
-        window.addEventListener("resize", () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
         });
+
+        function processCommand(command) {
+            let response = "";
+            switch (command) {
+                case "help":
+                    response = "Available commands: <b>help</b>, <b>whoami</b>, <b>projects</b>, <b>enter</b>";
+                    break;
+                case "whoami":
+                    response = "You are a visitor exploring dfinn.me.";
+                    break;
+                case "projects":
+                    response = "Check out my GitHub: <a href='https://github.com/finn1817' target='_blank'>GitHub</a>";
+                    break;
+                case "enter":
+                    window.location.href = "https://dfinn.me/HomePage";
+                    return;
+                case "matrix":
+                    secretMessage.style.display = "block";
+                    return;
+                default:
+                    response = "Unknown command. Type <b>help</b> for available commands.";
+            }
+            outputDiv.innerHTML += `<p>user@dfinn.me:~$ ${command}</p><p>${response}</p>`;
+        }
     </script>
 
 </body>
