@@ -89,10 +89,14 @@
 
         function processCommand(command) {
             let output = document.getElementById("output");
+            output.innerHTML += `<p>> ${command}</p>`;
 
-            switch (command) {
+            let args = command.split(" ");
+            let cmd = args[0];
+
+            switch (cmd) {
                 case "help":
-                    output.innerHTML = `
+                    output.innerHTML += `
                         <p>Commands:</p>
                         <ul>
                             <li>matrix - Activate Matrix effect</li>
@@ -119,7 +123,7 @@
                     output.innerHTML = "";
                     break;
                 case "projects":
-                    output.innerHTML = `
+                    output.innerHTML += `
                         <p>Here are my projects & links:</p>
                         <ul>
                             <li><a href="https://github.com/finn1817/NATracker" target="_blank">NATracker</a></li>
@@ -133,63 +137,49 @@
                     startMatrixEffect();
                     break;
                 case "fact":
-                    output.innerHTML = `<p>${facts[Math.floor(Math.random() * facts.length)]}</p>`;
+                    output.innerHTML += `<p>${facts[Math.floor(Math.random() * facts.length)]}</p>`;
                     break;
                 case "invert":
                     document.body.style.filter = "invert(1)";
                     setTimeout(() => document.body.style.filter = "none", 2000);
                     break;
-                case "shake":
-                    document.body.style.animation = "shake 0.5s";
-                    setTimeout(() => document.body.style.animation = "", 500);
-                    break;
-                case "spin":
-                    document.body.style.transition = "transform 1s";
-                    document.body.style.transform = "rotate(360deg)";
-                    setTimeout(() => document.body.style.transform = "", 1000);
-                    break;
-                case "glitch":
-                    let originalText = document.body.innerHTML;
-                    document.body.innerHTML = "<h1 style='color: red;'>GLITCHED!</h1>";
-                    setTimeout(() => document.body.innerHTML = originalText, 500);
-                    break;
-                case "fireworks":
-                    alert("🎆 Fireworks Effect!");
+                case "random":
+                    if (args.length === 3) {
+                        let min = parseInt(args[1]);
+                        let max = parseInt(args[2]);
+                        if (!isNaN(min) && !isNaN(max) && min < max) {
+                            output.innerHTML += `<p>Random Number: ${Math.floor(Math.random() * (max - min + 1)) + min}</p>`;
+                        } else {
+                            output.innerHTML += `<p>Usage: random [min] [max]</p>`;
+                        }
+                    } else {
+                        output.innerHTML += `<p>Usage: random [min] [max]</p>`;
+                    }
                     break;
                 default:
-                    if (command.startsWith("add ")) {
-                        let nums = command.split(" ").slice(1).map(Number);
-                        output.innerHTML = `<p>Result: ${nums[0] + nums[1]}</p>`;
-                    } else if (command.startsWith("subtract ")) {
-                        let nums = command.split(" ").slice(1).map(Number);
-                        output.innerHTML = `<p>Result: ${nums[0] - nums[1]}</p>`;
+                    if (args.length === 3) {
+                        let num1 = parseFloat(args[1]);
+                        let num2 = parseFloat(args[2]);
+                        if (!isNaN(num1) && !isNaN(num2)) {
+                            switch (cmd) {
+                                case "add": output.innerHTML += `<p>Result: ${num1 + num2}</p>`; break;
+                                case "subtract": output.innerHTML += `<p>Result: ${num1 - num2}</p>`; break;
+                                case "multiply": output.innerHTML += `<p>Result: ${num1 * num2}</p>`; break;
+                                case "divide": 
+                                    output.innerHTML += num2 !== 0 ? `<p>Result: ${num1 / num2}</p>` : "<p>Cannot divide by zero</p>";
+                                    break;
+                                case "power": output.innerHTML += `<p>Result: ${Math.pow(num1, num2)}</p>`; break;
+                                default: output.innerHTML += `<p>Unknown command: ${command}</p>`;
+                            }
+                        }
+                    } else if (args.length === 2 && cmd === "sqrt") {
+                        let num = parseFloat(args[1]);
+                        output.innerHTML += `<p>Result: ${Math.sqrt(num)}</p>`;
                     } else {
-                        output.innerHTML = `<p>Unknown command: ${command}</p>`;
+                        output.innerHTML += `<p>Unknown command: ${command}</p>`;
                     }
                     break;
             }
-        }
-
-        function startMatrixEffect() {
-            let canvas = document.getElementById("matrix");
-            let ctx = canvas.getContext("2d");
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            let chars = "01";
-            let drops = Array(Math.floor(canvas.width / 20)).fill(0);
-
-            function draw() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#0F0";
-                ctx.font = "20px monospace";
-                drops.forEach((y, i) => {
-                    ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 20, y);
-                    drops[i] = y > canvas.height || Math.random() > 0.975 ? 0 : y + 20;
-                });
-                requestAnimationFrame(draw);
-            }
-            draw();
         }
     </script>
 
