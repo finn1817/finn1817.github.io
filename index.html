@@ -6,178 +6,182 @@
     <title>Welcome to dfinn.me</title>
     <style>
         body {
-            font-family: Consolas, monospace;
-            background-color: black;
-            color: limegreen;
+            font-family: Arial, sans-serif;
             text-align: center;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            transition: background 0.5s ease;
+            overflow: hidden;
         }
-        #terminal {
-            width: 80%;
-            max-width: 800px;
-            height: 400px;
-            background: black;
-            color: limegreen;
-            border: 2px solid limegreen;
-            padding: 10px;
-            overflow-y: auto;
-            text-align: left;
-            margin: 20px auto;
-            font-size: 16px;
-        }
-        #input {
-            width: 100%;
-            background: black;
-            color: limegreen;
+        #command-input {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            font-size: 20px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
             border: none;
-            font-family: Consolas, monospace;
-            font-size: 16px;
+            border-bottom: 2px solid white;
+            color: white;
             outline: none;
+            text-align: center;
         }
-        #commands-btn {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: limegreen;
-            color: black;
-            padding: 5px 10px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
+        #output {
+            margin-top: 20px;
+            min-height: 200px;
         }
         .hidden { display: none; }
-        .matrix-effect {
+        .matrix {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: -1;
             background: black;
-            z-index: 999;
-            pointer-events: none;
+            overflow: hidden;
+            display: none;
         }
-        canvas {
+        .command-button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 18px;
+            color: white;
+            background: #222;
+            border: 1px solid white;
+            cursor: pointer;
+        }
+        .command-button:hover {
+            background: #444;
+        }
+        #command-list {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            border: 1px solid white;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <button id="commands-btn">List All Commands</button>
-    
     <h1>Welcome to dfinn.me</h1>
-    <p>Type commands below to interact with the site.</p>
+    <p>Type a command below:</p>
 
-    <div id="terminal">
-        <p>> Welcome to dfinn.me! Type 'help' for a list of commands.</p>
-    </div>
+    <input type="text" id="command-input" placeholder="Enter command..." autofocus>
+    <div id="output"></div>
 
-    <input type="text" id="input" placeholder="Enter command..." autofocus>
-
-    <div id="matrix" class="hidden">
-        <canvas id="matrixCanvas"></canvas>
-    </div>
+    <div id="command-list">List All Commands</div>
+    <canvas class="matrix" id="matrix"></canvas>
 
     <script>
-        const terminal = document.getElementById("terminal");
-        const input = document.getElementById("input");
-        const matrixDiv = document.getElementById("matrix");
-        const commandsBtn = document.getElementById("commands-btn");
-
-        const factList = [
-            "Did you know? The first computer bug was a real bug—a moth stuck in a relay.",
-            "NASA’s Apollo computers had less processing power than a modern smartphone.",
-            "The first ever website is still online: 'info.cern.ch'.",
-            "The 'Hello, World!' program was first used in the C programming book by Brian Kernighan.",
-            "A group of crows is called a 'murder'.",
-            "The longest English word is 189,819 letters long—it’s the full name of a protein!",
-            "The Eiffel Tower can be 15 cm taller during the summer due to heat expansion.",
-            "There are more possible games of chess than atoms in the observable universe.",
-            "The first email ever sent was by Ray Tomlinson to himself in 1971.",
-            "The original name for Windows was 'Interface Manager'."
+        let lastCommand = "";
+        let uptimeStart = Date.now();
+        let secretColors = ["red", "white", "blue", "black", "green", "purple", "orange"];
+        let secretIndex = 0;
+        let facts = [
+            "The first computer virus was created in 1986 and called 'Brain'.",
+            "The first 1GB hard drive was released in 1980 and cost $40,000.",
+            "Ada Lovelace is credited as the first computer programmer.",
+            "The Apollo 11 guidance computer had only 64KB of memory.",
+            "More than 90% of the world's currency exists only in computers.",
+            "Python is named after Monty Python, not the snake."
         ];
 
-        const commands = {
-            "help": () => "Available commands: help, about, fact, projects, clear, secret",
-            "about": () => "I am Dan, a computer science student passionate about coding, web development, and software engineering.",
-            "fact": () => factList[Math.floor(Math.random() * factList.length)],
-            "projects": () => `
-                <p>Here are some of my current projects:</p>
-                <h2>Websites</h2>
-                <a href="https://finn1817.github.io/My-Calculator/" target="_blank">My working Calculator</a>
-                <a href="https://finn1817.github.io/TikTakToeGame/" target="_blank">Tik-Tak-Toe Game</a>
-                <a href="https://finn1817.github.io/Unit-Conversion/" target="_blank">Unit Conversion Site</a>
-                <a href="https://finn1817.github.io/Future-Finance/" target="_blank">Finance Checker</a>
-                <a href="https://finn1817.github.io/Resume-Builder/" target="_blank">Resume Builder</a>
-                <h2>Other Projects</h2>
-                <a href="https://github.com/finn1817/NATracker" target="_blank">NATracker - GitHub</a>
-                <a href="https://drive.google.com/drive/folders/1Sq4B32br7vLmy4TPaHv9eJboiZ0ie2Eo?usp=sharing" target="_blank">Zillow-Like Database Project</a>
-            `,
-            "clear": () => {
-                terminal.innerHTML = "<p>> Welcome to dfinn.me! Type 'help' for a list of commands.</p>";
-                return "";
-            },
-            "secret": () => {
-                document.body.style.background = "red";
-                setTimeout(() => document.body.style.background = "black", 2000);
-                return "You have unlocked a secret...";
-            },
-            "matrix": () => {
-                matrixDiv.classList.remove("hidden");
-                startMatrixEffect();
-                return "Entering the Matrix...";
+        document.getElementById("command-input").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                let input = this.value.trim().toLowerCase();
+                if (input) {
+                    lastCommand = input;
+                    processCommand(input);
+                    this.value = "";
+                }
+            } else if (event.key === "ArrowUp") {
+                this.value = lastCommand;
             }
-        };
+        });
 
-        function processCommand() {
-            const command = input.value.toLowerCase().trim();
-            if (command in commands) {
-                const result = commands[command]();
-                terminal.innerHTML += `<p>> ${command}</p><p>${result}</p>`;
-            } else {
-                terminal.innerHTML += `<p>> ${command}</p><p>Unknown command. Type 'help' for a list of commands.</p>`;
+        function processCommand(command) {
+            let output = document.getElementById("output");
+
+            switch (command) {
+                case "help":
+                    output.innerHTML = "<p>Commands: matrix, math, cloudconvert, gdb, github, resume, portfolio, pageMemory, uptime, fireworks, glitch, spin, shake, joke, fact, invert, weather</p>";
+                    break;
+                case "secret":
+                    document.body.style.backgroundColor = secretColors[secretIndex];
+                    secretIndex = (secretIndex + 1) % secretColors.length;
+                    break;
+                case "matrix":
+                    document.getElementById("matrix").style.display = "block";
+                    startMatrixEffect();
+                    break;
+                case "uptime":
+                    let uptime = ((Date.now() - uptimeStart) / 1000).toFixed(1);
+                    output.innerHTML = `<p>Page uptime: ${uptime} seconds</p>`;
+                    break;
+                case "fact":
+                    output.innerHTML = `<p>${facts[Math.floor(Math.random() * facts.length)]}</p>`;
+                    break;
+                case "invert":
+                    document.body.style.filter = "invert(1)";
+                    break;
+                case "fireworks":
+                    alert("🔥 Fireworks animation coming soon!");
+                    break;
+                case "shake":
+                    document.body.style.transform = "translateX(5px)";
+                    setTimeout(() => document.body.style.transform = "", 500);
+                    break;
+                case "weather":
+                    let weathers = ["☀️ Sunny", "🌧️ Rainy", "❄️ Snowy", "⛅ Cloudy"];
+                    output.innerHTML = `<p>Current Weather: ${weathers[Math.floor(Math.random() * weathers.length)]}</p>`;
+                    break;
+                case "pageMemory":
+                    output.innerHTML = `<p>Memory used: ${(performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB</p>`;
+                    break;
+                default:
+                    if (command.startsWith("cloudconvert")) {
+                        window.open("https://cloudconvert.com/", "_blank");
+                    } else if (command.startsWith("gdb")) {
+                        window.open("https://www.onlinegdb.com/", "_blank");
+                    } else {
+                        output.innerHTML = `<p>Unknown command: ${command}</p>`;
+                    }
+                    break;
             }
-            terminal.scrollTop = terminal.scrollHeight;
-            input.value = "";
         }
 
-        input.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                processCommand();
-            }
-        });
-
-        commandsBtn.addEventListener("click", function() {
-            alert(commands["help"]());
-        });
-
         function startMatrixEffect() {
-            const canvas = document.getElementById("matrixCanvas");
-            const ctx = canvas.getContext("2d");
+            let canvas = document.getElementById("matrix");
+            let ctx = canvas.getContext("2d");
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            const fontSize = 16;
-            const columns = canvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
+            let chars = "01";
+            let columns = canvas.width / 20;
+            let drops = Array(Math.floor(columns)).fill(0);
 
-            function drawMatrix() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = "#0F0";
-                ctx.font = fontSize + "px monospace";
+                ctx.font = "20px monospace";
                 drops.forEach((y, i) => {
-                    const text = letters[Math.floor(Math.random() * letters.length)];
-                    ctx.fillText(text, i * fontSize, y * fontSize);
-                    drops[i] = y * fontSize > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
+                    let text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * 20, y);
+                    drops[i] = y > canvas.height || Math.random() > 0.975 ? 0 : y + 20;
                 });
+                requestAnimationFrame(draw);
             }
-
-            setInterval(drawMatrix, 50);
+            draw();
         }
     </script>
 
