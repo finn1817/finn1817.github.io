@@ -10,10 +10,17 @@
             text-align: center;
             margin: 0;
             padding: 0;
-            background-color: black;
-            color: white;
+            background-color: white;
+            color: royalblue;
             transition: background 0.5s ease;
             overflow: hidden;
+        }
+        h1 {
+            margin-top: 50px;
+            font-size: 36px;
+        }
+        p {
+            font-size: 18px;
         }
         #command-input {
             position: absolute;
@@ -23,10 +30,9 @@
             width: 50%;
             font-size: 20px;
             padding: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-bottom: 2px solid white;
-            color: white;
+            background: white;
+            border: 2px solid royalblue;
+            color: royalblue;
             outline: none;
             text-align: center;
         }
@@ -34,7 +40,6 @@
             margin-top: 20px;
             min-height: 200px;
         }
-        .hidden { display: none; }
         .matrix {
             position: fixed;
             top: 0;
@@ -43,30 +48,16 @@
             height: 100%;
             z-index: -1;
             background: black;
-            overflow: hidden;
             display: none;
-        }
-        .command-button {
-            display: block;
-            margin: 10px auto;
-            padding: 10px;
-            font-size: 18px;
-            color: white;
-            background: #222;
-            border: 1px solid white;
-            cursor: pointer;
-        }
-        .command-button:hover {
-            background: #444;
         }
         #command-list {
             position: absolute;
             top: 10px;
             right: 10px;
             padding: 10px;
-            border: 1px solid white;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
+            border: 1px solid royalblue;
+            background: rgba(255, 255, 255, 0.9);
+            color: royalblue;
             cursor: pointer;
         }
     </style>
@@ -84,7 +75,6 @@
 
     <script>
         let lastCommand = "";
-        let uptimeStart = Date.now();
         let secretColors = ["red", "white", "blue", "black", "green", "purple", "orange"];
         let secretIndex = 0;
         let facts = [
@@ -114,48 +104,43 @@
 
             switch (command) {
                 case "help":
-                    output.innerHTML = "<p>Commands: matrix, math, cloudconvert, gdb, github, resume, portfolio, pageMemory, uptime, fireworks, glitch, spin, shake, joke, fact, invert, weather</p>";
+                    output.innerHTML = "<p>Commands: matrix, secret, joke, fact, invert, shake, spin, glitch, fireworks</p>";
                     break;
                 case "secret":
                     document.body.style.backgroundColor = secretColors[secretIndex];
                     secretIndex = (secretIndex + 1) % secretColors.length;
                     break;
                 case "matrix":
-                    document.getElementById("matrix").style.display = "block";
+                    let matrixCanvas = document.getElementById("matrix");
+                    matrixCanvas.style.display = "block";
                     startMatrixEffect();
-                    break;
-                case "uptime":
-                    let uptime = ((Date.now() - uptimeStart) / 1000).toFixed(1);
-                    output.innerHTML = `<p>Page uptime: ${uptime} seconds</p>`;
                     break;
                 case "fact":
                     output.innerHTML = `<p>${facts[Math.floor(Math.random() * facts.length)]}</p>`;
                     break;
                 case "invert":
                     document.body.style.filter = "invert(1)";
-                    break;
-                case "fireworks":
-                    alert("🔥 Fireworks animation coming soon!");
+                    setTimeout(() => document.body.style.filter = "none", 2000);
                     break;
                 case "shake":
-                    document.body.style.transform = "translateX(5px)";
-                    setTimeout(() => document.body.style.transform = "", 500);
+                    document.body.style.animation = "shake 0.5s";
+                    setTimeout(() => document.body.style.animation = "", 500);
                     break;
-                case "weather":
-                    let weathers = ["☀️ Sunny", "🌧️ Rainy", "❄️ Snowy", "⛅ Cloudy"];
-                    output.innerHTML = `<p>Current Weather: ${weathers[Math.floor(Math.random() * weathers.length)]}</p>`;
+                case "spin":
+                    document.body.style.transition = "transform 1s";
+                    document.body.style.transform = "rotate(360deg)";
+                    setTimeout(() => document.body.style.transform = "", 1000);
                     break;
-                case "pageMemory":
-                    output.innerHTML = `<p>Memory used: ${(performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB</p>`;
+                case "glitch":
+                    let originalText = document.body.innerHTML;
+                    document.body.innerHTML = "<h1 style='color: red;'>GLITCHED!</h1>";
+                    setTimeout(() => document.body.innerHTML = originalText, 500);
+                    break;
+                case "fireworks":
+                    alert("🎆 Fireworks Effect!");
                     break;
                 default:
-                    if (command.startsWith("cloudconvert")) {
-                        window.open("https://cloudconvert.com/", "_blank");
-                    } else if (command.startsWith("gdb")) {
-                        window.open("https://www.onlinegdb.com/", "_blank");
-                    } else {
-                        output.innerHTML = `<p>Unknown command: ${command}</p>`;
-                    }
+                    output.innerHTML = `<p>Unknown command: ${command}</p>`;
                     break;
             }
         }
@@ -183,6 +168,25 @@
             }
             draw();
         }
+
+        // shake animation
+        document.head.insertAdjacentHTML("beforeend", `
+            <style>
+                @keyframes shake {
+                    0% { transform: translate(1px, 1px) rotate(0deg); }
+                    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+                    20% { transform: translate(-3px, 0px) rotate(1deg); }
+                    30% { transform: translate(3px, 2px) rotate(0deg); }
+                    40% { transform: translate(1px, -1px) rotate(1deg); }
+                    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+                    60% { transform: translate(-3px, 1px) rotate(0deg); }
+                    70% { transform: translate(3px, 1px) rotate(-1deg); }
+                    80% { transform: translate(-1px, -1px) rotate(1deg); }
+                    90% { transform: translate(1px, 2px) rotate(0deg); }
+                    100% { transform: translate(1px, -2px) rotate(-1deg); }
+                }
+            </style>
+        `);
     </script>
 
 </body>
