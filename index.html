@@ -3,19 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entry Point</title>
+    <title>dfinn.me | Welcome Page</title>
     <style>
-        /* very general styling I found online*/
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        /* Global Styling */
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
-            color: #ffffff;
-            background-color: #0d0d0d;
+            font-family: 'Press Start 2P', sans-serif;
+            color: #00ffcc;
+            background: #000;
             text-align: center;
             overflow: hidden;
         }
-        /* animated effect */
+
+        /* Centered Content */
+        .container {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Animated Glitch Text */
+        .glitch {
+            font-size: 2.5em;
+            font-weight: bold;
+            position: relative;
+            text-transform: uppercase;
+            animation: glitch 1.5s infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 2px 2px 0 #ff0000, -2px -2px 0 #00ff00; }
+            25% { text-shadow: -2px -2px 0 #ff0000, 2px 2px 0 #00ff00; }
+            50% { text-shadow: 2px -2px 0 #ff0000, -2px 2px 0 #00ff00; }
+            75% { text-shadow: -2px 2px 0 #ff0000, 2px -2px 0 #00ff00; }
+            100% { text-shadow: 2px 2px 0 #ff0000, -2px -2px 0 #00ff00; }
+        }
+
+        /* Typing Effect */
+        .typing {
+            display: inline-block;
+            font-size: 1.2em;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00ffcc;
+            animation: typing 3s steps(20) infinite alternate, blink 0.5s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            from { border-color: transparent; }
+            to { border-color: #00ffcc; }
+        }
+
+        /* Button - 3D Hover Effect */
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #000;
+            background: linear-gradient(90deg, #00ffcc, #007bff);
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.5);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .button:hover {
+            transform: rotateY(360deg);
+            background: linear-gradient(90deg, #007bff, #00ffcc);
+        }
+
+        /* Mouse Particle Effect */
         canvas {
             position: fixed;
             top: 0;
@@ -24,95 +91,78 @@
             height: 100%;
             z-index: -1;
         }
-        /* centering everything */
-        .container {
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        h1 {
-            font-size: 2.5em;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            animation: fadeIn 1.5s ease-in-out;
-        }
-        p {
-            font-size: 1.2em;
-            opacity: 0.8;
-            animation: fadeIn 2s ease-in-out;
-        }
-        /* styling the button */
-        .button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            font-size: 18px;
-            color: #fff;
-            background: linear-gradient(90deg, #007bff, #00d4ff);
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            letter-spacing: 1px;
-            transition: 0.3s ease-in-out;
-        }
-        .button:hover {
-            transform: scale(1.05);
-            background: linear-gradient(90deg, #00d4ff, #007bff);
-        }
-        /* subtle animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
     </style>
 </head>
 <body>
-    <canvas id="matrixCanvas"></canvas> <!-- background effect -->
+
+    <canvas id="particleCanvas"></canvas> <!-- Particle Effect -->
+    
     <div class="container">
-        <h1>Welcome to dfinn.me</h1>
-        <p>This is the entry point to me website!</p>
+        <div class="glitch">dfinn.me</div>
+        <p class="typing">> Welcome to my digital space...</p>
         <a href="https://dfinn.me/HomePage" class="button">Enter</a>
     </div>
+
     <script>
-        // matrix Effect "the code rain"
-        const canvas = document.getElementById("matrixCanvas");
+        // Particle Effect
+        const canvas = document.getElementById("particleCanvas");
         const ctx = canvas.getContext("2d");
 
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const letters = "01";
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
+        let particles = [];
 
-        const drops = Array(Math.floor(columns)).fill(1);
+        class Particle {
+            constructor(x, y, size, speedX, speedY) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.speedX = speedX;
+                this.speedY = speedY;
+            }
 
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.05;
+            }
 
-            ctx.fillStyle = "#00ff00";
-            ctx.font = `${fontSize}px monospace`;
-
-            for (let i = 0; i < drops.length; i++) {
-                const text = letters[Math.floor(Math.random() * letters.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
+            draw() {
+                ctx.fillStyle = "#00ffcc";
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
-        setInterval(drawMatrix, 50);
-        // resizing the canvas on window resize
+
+        function createParticles(event) {
+            const xPos = event.x;
+            const yPos = event.y;
+            for (let i = 0; i < 5; i++) {
+                particles.push(new Particle(xPos, yPos, Math.random() * 5 + 1, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2));
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.size <= 0.2) particles.splice(index, 1);
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener("mousemove", createParticles);
+        animateParticles();
+
+        // Resize Canvas
         window.addEventListener("resize", () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
     </script>
+
 </body>
 </html>
