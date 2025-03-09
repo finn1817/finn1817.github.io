@@ -1,187 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dfinn.me - Command Interface</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: white;
-            color: royalblue;
-            text-align: center;
-            margin: 50px;
-        }
-        #command-container {
-            margin-top: 20px;
-        }
-        #output {
-            min-height: 200px;
-            padding: 10px;
-            border: 2px solid royalblue;
-            background-color: white;
-            color: black;
-            text-align: left;
-            white-space: pre-wrap;
-            font-family: monospace;
-            overflow-y: auto;
-        }
-        input {
-            width: 80%;
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid royalblue;
-            text-align: center;
-        }
-        .hidden { display: none; }
-        .glitch { animation: glitch 0.2s infinite alternate; }
-        .shake { animation: shake 0.5s ease-in-out infinite; }
-        .spin { animation: spin 2s linear infinite; }
-        @keyframes glitch { 0% { transform: translate(2px, 0); } 100% { transform: translate(-2px, 0); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dfinn.me - Command Interface</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: white;
+      color: royalblue;
+      text-align: center;
+      margin: 50px;
+      transition: background 0.5s ease;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 18px;
+    }
+    #commandInput {
+      width: 80%;
+      padding: 10px;
+      font-size: 18px;
+      border: 2px solid royalblue;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #output {
+      border: 2px solid royalblue;
+      padding: 10px;
+      background-color: white;
+      color: black;
+      text-align: left;
+      min-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: black;
+      display: none;
+    }
+    /* Glitch overlay effect */
+    .glitch-effect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 0, 0, 0.2);
+      z-index: 9999;
+      animation: glitch 0.1s steps(2, end) infinite;
+    }
+    @keyframes glitch {
+      0% { clip: rect(10px, 9999px, 20px, 0); transform: translate(0); }
+      20% { clip: rect(5px, 9999px, 15px, 0); transform: translate(-5px, 5px); }
+      40% { clip: rect(10px, 9999px, 25px, 0); transform: translate(5px, -5px); }
+      60% { clip: rect(15px, 9999px, 30px, 0); transform: translate(-5px, -5px); }
+      80% { clip: rect(10px, 9999px, 20px, 0); transform: translate(5px, 5px); }
+      100% { clip: rect(10px, 9999px, 20px, 0); transform: translate(0); }
+    }
+    /* Shake animation */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    /* Spin animation */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
+  <h1>Welcome to dfinn.me</h1>
+  <p>Enter a command below:</p>
+  <input type="text" id="commandInput" placeholder="Type a command..." autofocus />
+  <div id="output"></div>
+  <canvas class="matrix" id="matrixCanvas"></canvas>
 
-    <h1>Welcome to dfinn.me</h1>
-    <p>Enter a command below:</p>
+  <script>
+    let previousCommand = "";
+    let secretColors = ["red", "blue", "green", "black", "purple", "orange", "white"];
+    let currentColorIndex = 0;
+    let facts = [
+      "C++ was created by Bjarne Stroustrup in 1983.",
+      "Python is named after Monty Python, not the snake.",
+      "The first computer bug was an actual moth found in a Harvard Mark II computer.",
+      "JavaScript was created in just 10 days.",
+      "The world's first website is still online: http://info.cern.ch/"
+    ];
+    let jokes = [
+      "Why do programmers prefer dark mode? Because light attracts bugs!",
+      "A programmer’s wife tells him: 'Go to the store and get a loaf of bread. If they have eggs, get a dozen.' He comes home with 12 loaves.",
+      "How many programmers does it take to change a light bulb? None, that's a hardware problem!"
+    ];
 
-    <div id="command-container">
-        <input type="text" id="commandInput" placeholder="Type a command..." autofocus>
-    </div>
-    
-    <div id="output"></div>
+    document.getElementById("commandInput").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        handleCommand();
+      } else if (event.key === "ArrowUp") {
+        this.value = previousCommand;
+      }
+    });
 
-    <script>
-        let previousCommand = "";
-        let secretColors = ["red", "blue", "green", "black", "purple", "orange", "white"];
-        let currentColorIndex = 0;
+    function handleCommand() {
+      let inputField = document.getElementById("commandInput");
+      let output = document.getElementById("output");
+      let command = inputField.value.trim().toLowerCase();
+      if (!command) return;
+      previousCommand = command;
+      output.innerHTML += `\n> ${command}`;
+      let args = command.split(" ");
+      let cmd = args[0];
 
-        let facts = [
-            "C++ was created by Bjarne Stroustrup in 1983.",
-            "Python is named after Monty Python, not the snake.",
-            "The first computer bug was an actual moth found in a Harvard Mark II computer.",
-            "JavaScript was created in just 10 days.",
-            "The world's first website is still online: http://info.cern.ch/"
-        ];
-
-        document.getElementById("commandInput").addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
-                handleCommand();
-            } else if (event.key === "ArrowUp") {
-                document.getElementById("commandInput").value = previousCommand;
+      switch (cmd) {
+        case "help":
+          output.innerHTML += `
+Available commands:
+- help: Show this help message.
+- clear: Clear the output.
+- secret: Cycle through background colors.
+- matrix: Activate Matrix effect in the background.
+- shake: Shake the screen.
+- spin: Spin the screen.
+- glitch: Trigger a glitch effect.
+- random [min] [max]: Generate a random number between min and max.
+- add [x] [y]: Add two numbers.
+- subtract [x] [y]: Subtract second number from first.
+- multiply [x] [y]: Multiply two numbers.
+- divide [x] [y]: Divide first number by second.
+- sqrt [x]: Square root of a number.
+- power [x] [y]: x raised to the power of y.
+- fact: Show a fun fact.
+- joke: Tell a programming joke.
+- pageMemory: Show page memory usage.
+- projects: Show my projects & links.
+- cloudconvert: Open CloudConvert.
+- onlinegdb: Open OnlineGDB.
+`;
+          break;
+        case "clear":
+          output.innerHTML = "";
+          break;
+        case "secret":
+          document.body.style.backgroundColor = secretColors[currentColorIndex];
+          currentColorIndex = (currentColorIndex + 1) % secretColors.length;
+          break;
+        case "matrix":
+          let matrixCanvas = document.getElementById("matrixCanvas");
+          matrixCanvas.style.display = "block";
+          startMatrixEffect();
+          break;
+        case "shake":
+          document.body.style.animation = "shake 0.5s";
+          setTimeout(() => (document.body.style.animation = ""), 500);
+          break;
+        case "spin":
+          document.body.style.animation = "spin 2s linear";
+          setTimeout(() => (document.body.style.animation = ""), 2000);
+          break;
+        case "glitch":
+          triggerGlitchEffect();
+          break;
+        case "random":
+          if (args.length === 3) {
+            let min = parseInt(args[1]);
+            let max = parseInt(args[2]);
+            if (!isNaN(min) && !isNaN(max) && min < max) {
+              let randNum = Math.floor(Math.random() * (max - min + 1)) + min;
+              output.innerHTML += `\nRandom Number: ${randNum}`;
+            } else {
+              output.innerHTML += "\nUsage: random [min] [max] (min < max)";
             }
-        });
+          } else {
+            output.innerHTML += "\nUsage: random [min] [max]";
+          }
+          break;
+        case "fact":
+          let randomFact = facts[Math.floor(Math.random() * facts.length)];
+          output.innerHTML += `\n${randomFact}`;
+          break;
+        case "joke":
+          let randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+          output.innerHTML += `\n${randomJoke}`;
+          break;
+        case "pageMemory":
+          if (performance.memory) {
+            output.innerHTML += `\nMemory Usage: ${(performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`;
+          } else {
+            output.innerHTML += "\nMemory usage not available.";
+          }
+          break;
+        case "projects":
+          output.innerHTML += `
+          
+Projects & Links:
+Websites:
+- <a href="https://finn1817.github.io/My-Calculator/" target="_blank">My working Calculator</a>
+- <a href="https://finn1817.github.io/TikTakToeGame/" target="_blank">Tik-Tak-Toe Game</a>
+- <a href="https://finn1817.github.io/Unit-Conversion/" target="_blank">Unit Conversion Site</a>
+- <a href="https://finn1817.github.io/Future-Finance/" target="_blank">Finance Checker</a>
+- <a href="https://finn1817.github.io/Resume-Builder/" target="_blank">Resume Builder</a>
 
-        function handleCommand() {
-            let input = document.getElementById("commandInput");
-            let output = document.getElementById("output");
-            let command = input.value.trim().toLowerCase();
-            
-            if (!command) return;
-            
-            previousCommand = command;
-            output.innerHTML += `<p>> ${command}</p>`;
+Other Projects:
+- <a href="https://github.com/finn1817/NATracker" target="_blank">NATracker (Journal Tracker)</a>
+- <a href="https://drive.google.com/drive/folders/1Sq4B32br7vLmy4TPaHv9eJboiZ0ie2Eo?usp=sharing" target="_blank">Zillow Like Database Project</a>
 
-            switch (command) {
-                case "help":
-                    output.innerHTML += "<p>Available commands: help, clear, secret, matrix, shake, spin, glitch, random, add, subtract, multiply, divide, fact, pageMemory, cloudconvert, onlinegdb</p>";
-                    break;
-                case "clear":
-                    output.innerHTML = "";
-                    break;
-                case "secret":
-                    document.body.style.backgroundColor = secretColors[currentColorIndex];
-                    currentColorIndex = (currentColorIndex + 1) % secretColors.length;
-                    break;
-                case "matrix":
-                    enableMatrixEffect();
-                    break;
-                case "shake":
-                    document.body.classList.add("shake");
-                    setTimeout(() => document.body.classList.remove("shake"), 3000);
-                    break;
-                case "spin":
-                    document.body.classList.add("spin");
-                    setTimeout(() => document.body.classList.remove("spin"), 3000);
-                    break;
-                case "glitch":
-                    document.body.classList.add("glitch");
-                    setTimeout(() => document.body.classList.remove("glitch"), 3000);
-                    break;
-                case "random":
-                    output.innerHTML += `<p>Random Number: ${Math.floor(Math.random() * 200)}</p>`;
-                    break;
-                case "fact":
-                    let randomFact = facts[Math.floor(Math.random() * facts.length)];
-                    output.innerHTML += `<p>${randomFact}</p>`;
-                    break;
-                case "pageMemory":
-                    let memoryUsage = performance.memory ? performance.memory.usedJSHeapSize : "Unavailable";
-                    output.innerHTML += `<p>Memory Usage: ${memoryUsage}</p>`;
-                    break;
-                case "cloudconvert":
-                    window.open("https://cloudconvert.com/", "_blank");
-                    break;
-                case "onlinegdb":
-                    window.open("https://www.onlinegdb.com/", "_blank");
-                    break;
-                default:
-                    if (command.startsWith("add") || command.startsWith("subtract") || command.startsWith("multiply") || command.startsWith("divide")) {
-                        handleMathCommand(command);
-                    } else {
-                        output.innerHTML += `<p>Unknown command: ${command}</p>`;
-                    }
-            }
-
-            input.value = "";
-        }
-
-        function handleMathCommand(command) {
-            let output = document.getElementById("output");
-            let numbers = prompt("Enter numbers separated by spaces:").split(" ").map(Number);
-            let result = 0;
-
-            switch (command) {
+Useful Links:
+- <a href="https://cloudconvert.com/" target="_blank">CloudConvert</a>
+- <a href="https://www.onlinegdb.com/" target="_blank">OnlineGDB</a>
+`;
+          break;
+        case "cloudconvert":
+          window.open("https://cloudconvert.com/", "_blank");
+          break;
+        case "onlinegdb":
+          window.open("https://www.onlinegdb.com/", "_blank");
+          break;
+        default:
+          // Math commands: add, subtract, multiply, divide, power
+          if (
+            (cmd === "add" ||
+              cmd === "subtract" ||
+              cmd === "multiply" ||
+              cmd === "divide" ||
+              cmd === "power") &&
+            args.length === 3
+          ) {
+            let num1 = parseFloat(args[1]);
+            let num2 = parseFloat(args[2]);
+            if (!isNaN(num1) && !isNaN(num2)) {
+              let result;
+              switch (cmd) {
                 case "add":
-                    result = numbers.reduce((a, b) => a + b, 0);
-                    break;
+                  result = num1 + num2;
+                  break;
                 case "subtract":
-                    result = numbers.reduce((a, b) => a - b);
-                    break;
+                  result = num1 - num2;
+                  break;
                 case "multiply":
-                    result = numbers.reduce((a, b) => a * b, 1);
-                    break;
+                  result = num1 * num2;
+                  break;
                 case "divide":
-                    result = numbers.reduce((a, b) => a / b);
-                    break;
-                default:
-                    output.innerHTML += `<p>Invalid math operation.</p>`;
-                    return;
+                  result = num2 !== 0 ? num1 / num2 : "Error: Divide by zero";
+                  break;
+                case "power":
+                  result = Math.pow(num1, num2);
+                  break;
+              }
+              output.innerHTML += `\nResult: ${result}`;
+            } else {
+              output.innerHTML += "\nInvalid numbers.";
             }
-            
-            output.innerHTML += `<p>Result: ${result}</p>`;
+          } else if (cmd === "sqrt" && args.length === 2) {
+            let num = parseFloat(args[1]);
+            if (!isNaN(num)) {
+              output.innerHTML += `\nResult: ${Math.sqrt(num)}`;
+            } else {
+              output.innerHTML += "\nInvalid number.";
+            }
+          } else {
+            output.innerHTML += `\nUnknown command: ${command}`;
+          }
+      }
+      inputField.value = "";
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function triggerGlitchEffect() {
+      let glitchOverlay = document.createElement("div");
+      glitchOverlay.className = "glitch-effect";
+      document.body.appendChild(glitchOverlay);
+      setTimeout(() => {
+        glitchOverlay.remove();
+      }, 1500);
+    }
+
+    function startMatrixEffect() {
+      let canvas = document.getElementById("matrixCanvas");
+      let ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let fontSize = 20;
+      let columns = canvas.width / fontSize;
+      let drops = [];
+      for (let i = 0; i < columns; i++) {
+        drops[i] = 0;
+      }
+      function draw() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0F0";
+        ctx.font = fontSize + "px monospace";
+        for (let i = 0; i < drops.length; i++) {
+          let text = chars.charAt(Math.floor(Math.random() * chars.length));
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
         }
-
-        function enableMatrixEffect() {
-            let matrix = document.createElement("div");
-            matrix.style.position = "fixed";
-            matrix.style.top = 0;
-            matrix.style.left = 0;
-            matrix.style.width = "100%";
-            matrix.style.height = "100%";
-            matrix.style.background = "black";
-            matrix.style.color = "green";
-            matrix.style.opacity = "0.8";
-            matrix.style.zIndex = "-1";
-            document.body.appendChild(matrix);
-
-            setInterval(() => {
-                matrix.innerHTML = Array.from({ length: 50 }, () => String.fromCharCode(33 + Math.random() * 94)).join(" ");
-            }, 100);
-        }
-    </script>
-
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+  </script>
 </body>
 </html>
