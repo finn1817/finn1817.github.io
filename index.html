@@ -50,16 +50,6 @@
             background: black;
             display: none;
         }
-        #command-list {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 10px;
-            border: 1px solid royalblue;
-            background: rgba(255, 255, 255, 0.9);
-            color: royalblue;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -69,8 +59,6 @@
 
     <input type="text" id="command-input" placeholder="Enter command..." autofocus>
     <div id="output"></div>
-
-    <div id="command-list">List All Commands</div>
     <canvas class="matrix" id="matrix"></canvas>
 
     <script>
@@ -104,11 +92,40 @@
 
             switch (command) {
                 case "help":
-                    output.innerHTML = "<p>Commands: matrix, secret, joke, fact, invert, shake, spin, glitch, fireworks</p>";
+                    output.innerHTML = `
+                        <p>Commands:</p>
+                        <ul>
+                            <li>matrix - Activate Matrix effect</li>
+                            <li>secret - Change background color</li>
+                            <li>joke - Show a random joke</li>
+                            <li>fact - Show a fun fact</li>
+                            <li>invert - Invert screen colors</li>
+                            <li>shake - Shake the screen</li>
+                            <li>spin - Spin the screen</li>
+                            <li>glitch - Trigger a glitch effect</li>
+                            <li>fireworks - Fireworks effect</li>
+                            <li>clear - Clear all previous output</li>
+                            <li>add [x] [y] - Adds x + y</li>
+                            <li>subtract [x] [y] - Subtracts x - y</li>
+                            <li>multiply [x] [y] - Multiplies x * y</li>
+                            <li>divide [x] [y] - Divides x / y</li>
+                            <li>sqrt [x] - Square root of x</li>
+                            <li>power [x] [y] - x raised to the power of y</li>
+                            <li>random [min] [max] - Generate random number</li>
+                            <li>projects - Show my projects & links</li>
+                        </ul>`;
                     break;
-                case "secret":
-                    document.body.style.backgroundColor = secretColors[secretIndex];
-                    secretIndex = (secretIndex + 1) % secretColors.length;
+                case "clear":
+                    output.innerHTML = "";
+                    break;
+                case "projects":
+                    output.innerHTML = `
+                        <p>Here are my projects & links:</p>
+                        <ul>
+                            <li><a href="https://github.com/finn1817/NATracker" target="_blank">NATracker</a></li>
+                            <li><a href="https://finn1817.github.io/DanFinn/" target="_blank">My Portfolio</a></li>
+                            <li><a href="https://www.dfinn.me/Resume-Website/" target="_blank">Resume Website</a></li>
+                        </ul>`;
                     break;
                 case "matrix":
                     let matrixCanvas = document.getElementById("matrix");
@@ -140,7 +157,15 @@
                     alert("🎆 Fireworks Effect!");
                     break;
                 default:
-                    output.innerHTML = `<p>Unknown command: ${command}</p>`;
+                    if (command.startsWith("add ")) {
+                        let nums = command.split(" ").slice(1).map(Number);
+                        output.innerHTML = `<p>Result: ${nums[0] + nums[1]}</p>`;
+                    } else if (command.startsWith("subtract ")) {
+                        let nums = command.split(" ").slice(1).map(Number);
+                        output.innerHTML = `<p>Result: ${nums[0] - nums[1]}</p>`;
+                    } else {
+                        output.innerHTML = `<p>Unknown command: ${command}</p>`;
+                    }
                     break;
             }
         }
@@ -151,8 +176,7 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             let chars = "01";
-            let columns = canvas.width / 20;
-            let drops = Array(Math.floor(columns)).fill(0);
+            let drops = Array(Math.floor(canvas.width / 20)).fill(0);
 
             function draw() {
                 ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
@@ -160,33 +184,13 @@
                 ctx.fillStyle = "#0F0";
                 ctx.font = "20px monospace";
                 drops.forEach((y, i) => {
-                    let text = chars[Math.floor(Math.random() * chars.length)];
-                    ctx.fillText(text, i * 20, y);
+                    ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 20, y);
                     drops[i] = y > canvas.height || Math.random() > 0.975 ? 0 : y + 20;
                 });
                 requestAnimationFrame(draw);
             }
             draw();
         }
-
-        // shake animation
-        document.head.insertAdjacentHTML("beforeend", `
-            <style>
-                @keyframes shake {
-                    0% { transform: translate(1px, 1px) rotate(0deg); }
-                    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-                    20% { transform: translate(-3px, 0px) rotate(1deg); }
-                    30% { transform: translate(3px, 2px) rotate(0deg); }
-                    40% { transform: translate(1px, -1px) rotate(1deg); }
-                    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-                    60% { transform: translate(-3px, 1px) rotate(0deg); }
-                    70% { transform: translate(3px, 1px) rotate(-1deg); }
-                    80% { transform: translate(-1px, -1px) rotate(1deg); }
-                    90% { transform: translate(1px, 2px) rotate(0deg); }
-                    100% { transform: translate(1px, -2px) rotate(-1deg); }
-                }
-            </style>
-        `);
     </script>
 
 </body>
