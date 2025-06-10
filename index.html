@@ -207,7 +207,7 @@
       notice.innerHTML = `Redirecting in ${countdown} seconds... <button onclick="cancelRedirect()">Cancel Redirect</button>`;
       if (countdown-- <= 0) {
         clearInterval(redirectTimer);
-        window.location.href = "https://dfinn.me/HomePage";
+        window.location.href = "https://dfinn.me/Main-Website";
       }
     }, 1000);
 
@@ -219,7 +219,7 @@
     // keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 'h') {
-        window.location.href = "https://dfinn.me/HomePage";
+        window.location.href = "https://dfinn.me/Main-Website";
       } else if (e.key.toLowerCase() === 't') {
         toggleTheme();
       } else if (e.key.toLowerCase() === 'a') {
