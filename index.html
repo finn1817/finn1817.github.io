@@ -330,7 +330,7 @@
     <p id="greeting"></p>
     
     <h2>My homepage is here:</h2>
-    <a href="https://dfinn.me/Main-Website" class="button" id="home-btn">🚀 Go to Homepage</a>
+    <a href="https://finnworks.dev/Main-Website" class="button" id="home-btn">🚀 Go to Homepage</a>
     <div id="redirect-notice"></div>
   </div>
 
@@ -406,7 +406,7 @@
       notice.innerHTML = `Redirecting in ${countdown} seconds... <button class="cancel-btn" onclick="cancelRedirect()">Cancel Redirect</button>`;
       if (countdown-- <= 0) {
         clearInterval(redirectTimer);
-        window.location.href = "https://dfinn.me/Main-Website";
+        window.location.href = "https://finnworks.dev/Main-Website";
       }
     }, 1000);
 
@@ -418,7 +418,7 @@
     // keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 'h') {
-        window.location.href = "https://dfinn.me/Main-Website";
+        window.location.href = "https://finnworks.dev/Main-Website";
       } else if (e.key.toLowerCase() === 't') {
         toggleTheme();
       } else if (e.key.toLowerCase() === 'a') {
