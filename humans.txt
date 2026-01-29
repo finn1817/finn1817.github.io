@@ -1,0 +1,10 @@
+/* TEAM */
+  Developer: Finn
+  Site: finnworks.dev
+  Github: github.com/finn1817
+
+/* SITE */
+  Last update: 2026
+  Standards: HTML5, CSS3
+  Components: GitHub Pages, Custom 404, Maintenance Mode
+  Tools: VS Code, Python, VS Code extensions
